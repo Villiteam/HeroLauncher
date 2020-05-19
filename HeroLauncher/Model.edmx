@@ -1,0 +1,144 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<edmx:Edmx Version="3.0" xmlns:edmx="http://schemas.microsoft.com/ado/2009/11/edmx">
+  <!-- EF Runtime content -->
+  <edmx:Runtime>
+    <!-- SSDL content -->
+    <edmx:StorageModels>
+    <Schema Namespace="HeroLauncherModel.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2012" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
+        <EntityType Name="Blogs">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="Title" Type="varchar" MaxLength="250" />
+          <Property Name="Subtitle" Type="varchar" MaxLength="250" />
+          <Property Name="Content" Type="text" />
+          <Property Name="Img" Type="text" />
+          <Property Name="Tag" Type="text" />
+          <Property Name="Author" Type="varchar" MaxLength="100" />
+          <Property Name="Active" Type="int" />
+          <Property Name="View" Type="int" />
+          <Property Name="CreateAt" Type="datetime" />
+          <Property Name="UpdateAt" Type="datetime" />
+        </EntityType>
+        <EntityType Name="ServerList">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="Name" Type="varchar" MaxLength="250" />
+          <Property Name="Version" Type="text" />
+          <Property Name="Mode" Type="text" />
+          <Property Name="IpV4" Type="varchar" MaxLength="50" />
+          <Property Name="IpText" Type="text" />
+          <Property Name="Port" Type="int" />
+          <Property Name="Active" Type="int" />
+          <Property Name="CreateAt" Type="datetime" />
+          <Property Name="UpdateAt" Type="datetime" />
+        </EntityType>
+        <EntityContainer Name="HeroLauncherModelStoreContainer">
+          <EntitySet Name="Blogs" EntityType="Self.Blogs" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="ServerList" EntityType="Self.ServerList" Schema="dbo" store:Type="Tables" />
+        </EntityContainer>
+      </Schema></edmx:StorageModels>
+    <!-- CSDL content -->
+    <edmx:ConceptualModels>
+      <Schema Namespace="HeroLauncherModel" Alias="Self" annotation:UseStrongSpatialTypes="false" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm">
+        <EntityType Name="Blogs">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="Title" Type="String" MaxLength="250" FixedLength="false" Unicode="false" />
+          <Property Name="Subtitle" Type="String" MaxLength="250" FixedLength="false" Unicode="false" />
+          <Property Name="Content" Type="String" MaxLength="Max" FixedLength="false" Unicode="false" />
+          <Property Name="Img" Type="String" MaxLength="Max" FixedLength="false" Unicode="false" />
+          <Property Name="Tag" Type="String" MaxLength="Max" FixedLength="false" Unicode="false" />
+          <Property Name="Author" Type="String" MaxLength="100" FixedLength="false" Unicode="false" />
+          <Property Name="Active" Type="Int32" />
+          <Property Name="View" Type="Int32" />
+          <Property Name="CreateAt" Type="DateTime" Precision="3" />
+          <Property Name="UpdateAt" Type="DateTime" Precision="3" />
+        </EntityType>
+        <EntityType Name="ServerList">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="Name" Type="String" MaxLength="250" FixedLength="false" Unicode="false" />
+          <Property Name="Version" Type="String" MaxLength="Max" FixedLength="false" Unicode="false" />
+          <Property Name="Mode" Type="String" MaxLength="Max" FixedLength="false" Unicode="false" />
+          <Property Name="IpV4" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="IpText" Type="String" MaxLength="Max" FixedLength="false" Unicode="false" />
+          <Property Name="Port" Type="Int32" />
+          <Property Name="Active" Type="Int32" />
+          <Property Name="CreateAt" Type="DateTime" Precision="3" />
+          <Property Name="UpdateAt" Type="DateTime" Precision="3" />
+        </EntityType>
+        <EntityContainer Name="HeroLauncherEntities" annotation:LazyLoadingEnabled="true">
+          <EntitySet Name="Blogs" EntityType="Self.Blogs" />
+          <EntitySet Name="ServerList" EntityType="Self.ServerList" />
+        </EntityContainer>
+      </Schema>
+    </edmx:ConceptualModels>
+    <!-- C-S mapping content -->
+    <edmx:Mappings>
+      <Mapping Space="C-S" xmlns="http://schemas.microsoft.com/ado/2009/11/mapping/cs">
+        <EntityContainerMapping StorageEntityContainer="HeroLauncherModelStoreContainer" CdmEntityContainer="HeroLauncherEntities">
+          <EntitySetMapping Name="Blogs">
+            <EntityTypeMapping TypeName="HeroLauncherModel.Blogs">
+              <MappingFragment StoreEntitySet="Blogs">
+                <ScalarProperty Name="UpdateAt" ColumnName="UpdateAt" />
+                <ScalarProperty Name="CreateAt" ColumnName="CreateAt" />
+                <ScalarProperty Name="View" ColumnName="View" />
+                <ScalarProperty Name="Active" ColumnName="Active" />
+                <ScalarProperty Name="Author" ColumnName="Author" />
+                <ScalarProperty Name="Id" ColumnName="Id" />
+                <ScalarProperty Name="Title" ColumnName="Title" />
+                <ScalarProperty Name="Subtitle" ColumnName="Subtitle" />
+                <ScalarProperty Name="Content" ColumnName="Content" />
+                <ScalarProperty Name="Img" ColumnName="Img" />
+                <ScalarProperty Name="Tag" ColumnName="Tag" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="ServerList">
+            <EntityTypeMapping TypeName="HeroLauncherModel.ServerList">
+              <MappingFragment StoreEntitySet="ServerList">
+                <ScalarProperty Name="UpdateAt" ColumnName="UpdateAt" />
+                <ScalarProperty Name="CreateAt" ColumnName="CreateAt" />
+                <ScalarProperty Name="Active" ColumnName="Active" />
+                <ScalarProperty Name="Port" ColumnName="Port" />
+                <ScalarProperty Name="IpText" ColumnName="IpText" />
+                <ScalarProperty Name="IpV4" ColumnName="IpV4" />
+                <ScalarProperty Name="Mode" ColumnName="Mode" />
+                <ScalarProperty Name="Id" ColumnName="Id" />
+                <ScalarProperty Name="Name" ColumnName="Name" />
+                <ScalarProperty Name="Version" ColumnName="Version" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+        </EntityContainerMapping>
+      </Mapping>
+    </edmx:Mappings>
+  </edmx:Runtime>
+  <!-- EF Designer content (DO NOT EDIT MANUALLY BELOW HERE) -->
+  <Designer xmlns="http://schemas.microsoft.com/ado/2009/11/edmx">
+    <Connection>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="MetadataArtifactProcessing" Value="EmbedInOutputAssembly" />
+      </DesignerInfoPropertySet>
+    </Connection>
+    <Options>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="ValidateOnBuild" Value="true" />
+        <DesignerProperty Name="EnablePluralization" Value="false" />
+        <DesignerProperty Name="IncludeForeignKeysInModel" Value="true" />
+        <DesignerProperty Name="UseLegacyProvider" Value="false" />
+        <DesignerProperty Name="CodeGenerationStrategy" Value="None" />
+      </DesignerInfoPropertySet>
+    </Options>
+    <!-- Diagram content (shape and connector positions) -->
+    <Diagrams></Diagrams>
+  </Designer>
+</edmx:Edmx>

@@ -1,0 +1,99 @@
+﻿<Window x:Class="HeroLauncher.Setting"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:HeroLauncher"
+        mc:Ignorable="d"
+        Title="Setting" Height="270" Width="500"
+        WindowStartupLocation="CenterScreen"
+        ResizeMode="NoResize"
+        Icon="/Asset/icon.png">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="30"></RowDefinition>
+            <RowDefinition Height="60"></RowDefinition>
+            <RowDefinition Height="50"></RowDefinition>
+            <RowDefinition Height="25"></RowDefinition>
+            <RowDefinition Height="25"></RowDefinition>
+            <RowDefinition Height="30"></RowDefinition>
+        </Grid.RowDefinitions>
+        <Grid Grid.Row="0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="100"></ColumnDefinition>
+                <ColumnDefinition></ColumnDefinition>
+            </Grid.ColumnDefinitions>
+            <TextBlock HorizontalAlignment="Right" VerticalAlignment="Center" Margin="0,0,10,0" FontWeight="Bold">Resolution</TextBlock>
+            <StackPanel Grid.Column="1" Orientation="Horizontal">
+                <TextBox x:Name="Height" Width="50" Height="25" VerticalAlignment="Center" VerticalContentAlignment="Center" HorizontalContentAlignment="Center">925</TextBox>
+                <TextBlock HorizontalAlignment="Left" VerticalAlignment="Center" Margin="5,0">X</TextBlock>
+                <TextBox x:Name="Width" Width="50" Height="25" VerticalAlignment="Center" VerticalContentAlignment="Center" HorizontalContentAlignment="Center">530</TextBox>
+                <CheckBox x:Name="FullScreen" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="10,0,0,0">FullScreen</CheckBox>
+            </StackPanel>
+        </Grid>
+        <Grid Grid.Row="1">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="100"></ColumnDefinition>
+                <ColumnDefinition></ColumnDefinition>
+            </Grid.ColumnDefinitions>
+            <TextBlock HorizontalAlignment="Right" VerticalAlignment="Center" Margin="0,0,10,0" FontWeight="Bold">Version List</TextBlock>
+            <StackPanel Orientation="Vertical" Grid.Column="1">
+                <CheckBox x:Name="Snapshots" Height="20" HorizontalAlignment="Left">Show Snapshots</CheckBox>
+                <CheckBox x:Name="Beta" Height="20" HorizontalAlignment="Left">Show Beta (2010-2011)</CheckBox>
+                <CheckBox x:Name="Alpha" Height="20" HorizontalAlignment="Left">Show Alpha (2010)</CheckBox>
+
+            </StackPanel>
+        </Grid>
+        <Grid Grid.Row="2">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="100"></ColumnDefinition>
+                <ColumnDefinition></ColumnDefinition>
+            </Grid.ColumnDefinitions>
+            <TextBlock HorizontalAlignment="Right" VerticalAlignment="Center" FontWeight="Bold" Margin="0,0,10,0">Arguments</TextBlock>
+            <StackPanel Grid.Column="1" Orientation="Vertical">
+                <StackPanel Orientation="Horizontal" Height="25">
+                    <TextBlock HorizontalAlignment="Left" VerticalAlignment="Center" Width="125">JVM Arguments</TextBlock>
+                    <TextBox x:Name="JVM" Height="20" VerticalAlignment="Center" HorizontalAlignment="Left" Width="250" Padding="10,0,0,0" HorizontalContentAlignment="Center" VerticalContentAlignment="Center"></TextBox>
+                </StackPanel>
+                <StackPanel Orientation="Horizontal" Height="25">
+                    <TextBlock HorizontalAlignment="Left" VerticalAlignment="Center" Width="125">Minecraft Arguments</TextBlock>
+                    <TextBox x:Name="MinecraftArg" Height="20" VerticalAlignment="Center" HorizontalAlignment="Left" Width="250" Padding="10,0,0,0" HorizontalContentAlignment="Center" VerticalContentAlignment="Center"></TextBox>
+                </StackPanel>
+            </StackPanel>
+        </Grid>
+        <Grid Grid.Row="3">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="100"></ColumnDefinition>
+                <ColumnDefinition></ColumnDefinition>
+            </Grid.ColumnDefinitions>
+            <TextBlock HorizontalAlignment="Right" VerticalAlignment="Center" FontWeight="Bold" Margin="0,0,10,0">Java path</TextBlock>
+            <StackPanel Orientation="Horizontal" Grid.Column="1">
+                <TextBox x:Name="JavaPath" Height="25" Width="320" HorizontalAlignment="Left" VerticalAlignment="Center"></TextBox>
+                <Button x:Name="JavaBrowse" Height="20" Width="50" HorizontalAlignment="Center" VerticalAlignment="Center" Padding="0" FontSize="10" Margin="5,0,0,0">Browse...</Button>
+            </StackPanel>
+        </Grid>
+        <Grid Grid.Row="4">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="100"></ColumnDefinition>
+                <ColumnDefinition></ColumnDefinition>
+            </Grid.ColumnDefinitions>
+            <TextBlock HorizontalAlignment="Right" VerticalAlignment="Center" FontWeight="Bold" Margin="0,0,10,0">Memory</TextBlock>
+            <StackPanel Grid.Column="1" Orientation="Horizontal">
+                <Slider x:Name="Memorys" TickFrequency="10" Maximum="6000" Minimum="512" Height="25" Width="320" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" DataContextChanged="Memorys_DataContextChanged" />
+                <TextBox x:Name="MemoryTextBox" Width="50" Height="20" HorizontalAlignment="Center" VerticalAlignment="Center" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Padding="0" Margin="5,0,0,0" FontSize="10" DataContextChanged="MemoryTextBox_DataContextChanged">512</TextBox>
+            </StackPanel>
+        </Grid>
+        <Grid Grid.Row="5">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition></ColumnDefinition>
+                <ColumnDefinition></ColumnDefinition>
+            </Grid.ColumnDefinitions>
+            <Button x:Name="DefaultBtn" Grid.Column="0" HorizontalAlignment="Center" VerticalAlignment="Center" Width="200" Height="25" Padding="0">
+                Reset To Defaults
+            </Button>
+            <Button x:Name="SaveBtn" Grid.Column="1" Width="200" Height="25" HorizontalAlignment="Center" VerticalAlignment="Center" Padding="0" Click="SaveBtn_Click">
+                Save
+            </Button>
+        </Grid>
+    </Grid>
+</Window>
