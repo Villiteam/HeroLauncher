@@ -48,6 +48,8 @@ namespace HeroLauncher
         public MainWindow()
         {
             InitializeComponent();
+            System.Net.ServicePointManager.DefaultConnectionLimit = 1000;
+
             if (File.Exists(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + @"\.HeroLauncher\Setting.json"))
             {
                 using (StreamReader r = new StreamReader(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + @"\.HeroLauncher\Setting.json"))
@@ -217,6 +219,7 @@ namespace HeroLauncher
             String ClassPathRun = "";
             String NativesPath = "";
             String FullCmd;
+            ShowHideProgress(true);
             if (verList.TryGetValue(VersionDownload, out result))
             {
                 versionDownload = GetJsonFromServer(result.url);
@@ -225,18 +228,17 @@ namespace HeroLauncher
                 return false;
             }
             //Assets
-            WebClient webClient = new WebClient();
             runFunction(5);
             runFunction1("Run Download");
             if (File.Exists(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + @"\.HeroLauncher\assets\indexes\" + versionDownload["assetIndex"]["id"].ToString() + @".json"))
             {
                 if (new FileInfo(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + @"\.HeroLauncher\assets\indexes\" + versionDownload["assetIndex"]["id"].ToString() + @".json").Length != long.Parse(versionDownload["assetIndex"]["size"].ToString()))
                 {
-                    webClient.DownloadFile(versionDownload["assetIndex"]["url"].ToString(), Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + @"\.HeroLauncher\assets\indexes\" + versionDownload["assetIndex"]["id"].ToString() + @".json");
+                    new WebClient().DownloadFile(versionDownload["assetIndex"]["url"].ToString(), Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + @"\.HeroLauncher\assets\indexes\" + versionDownload["assetIndex"]["id"].ToString() + @".json");
                 }
             } else
             {
-                webClient.DownloadFile(versionDownload["assetIndex"]["url"].ToString(), Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + @"\.HeroLauncher\assets\indexes\" + versionDownload["assetIndex"]["id"].ToString() + @".json");
+                new WebClient().DownloadFile(versionDownload["assetIndex"]["url"].ToString(), Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + @"\.HeroLauncher\assets\indexes\" + versionDownload["assetIndex"]["id"].ToString() + @".json");
             }
             JObject JsonAssetsFile;
             using (StreamReader r = new StreamReader(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + @"\.HeroLauncher\assets\indexes\" + versionDownload["assetIndex"]["id"].ToString() + @".json"))
@@ -248,28 +250,40 @@ namespace HeroLauncher
             runFunction(10);
             runFunction1("Download Assets");
             int countAsset = 0;
-
+            List<String> ready = new List<string>();
+            List<Task> tasksAsset = new List<Task>();
             foreach (var obj in JsonAssetsFile["objects"])
             {
                 String hashAssets = obj.First["hash"].ToString();
-                long sizeAssets = long.Parse(obj.First["size"].ToString());
-                Directory.CreateDirectory(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + @"\.HeroLauncher\assets\objects\" + hashAssets[0] + hashAssets[1]);
-                if (File.Exists(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + @"\.HeroLauncher\assets\objects\" + hashAssets[0] + hashAssets[1] + @"\" + hashAssets))
+                if (!ready.Contains(hashAssets))
                 {
-                    if (new FileInfo(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + @"\.HeroLauncher\assets\objects\" + hashAssets[0] + hashAssets[1] + @"\" + hashAssets).Length != sizeAssets)
+                    ready.Add(hashAssets);
+                    long sizeAssets = long.Parse(obj.First["size"].ToString());
+                    Directory.CreateDirectory(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + @"\.HeroLauncher\assets\objects\" + hashAssets[0] + hashAssets[1]);
+                    if (File.Exists(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + @"\.HeroLauncher\assets\objects\" + hashAssets[0] + hashAssets[1] + @"\" + hashAssets))
                     {
-                        webClient.DownloadFile(new Uri("http://resources.download.minecraft.net/" + hashAssets[0] + hashAssets[1] + @"/" + hashAssets), Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + @"\.HeroLauncher\assets\objects\" + hashAssets[0] + hashAssets[1] + @"\" + hashAssets);
+                        if (new FileInfo(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + @"\.HeroLauncher\assets\objects\" + hashAssets[0] + hashAssets[1] + @"\" + hashAssets).Length != sizeAssets)
+                        {
+                            tasksAsset.Add(Task.Factory.StartNew(() => new WebClient().DownloadFile("http://resources.download.minecraft.net/" + hashAssets[0] + hashAssets[1] + @"/" + hashAssets, Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + @"\.HeroLauncher\assets\objects\" + hashAssets[0] + hashAssets[1] + @"\" + hashAssets)));
+                        }
                     }
-                }
-                else
+                    else
+                    {
+                        tasksAsset.Add(Task.Factory.StartNew(() => new WebClient().DownloadFile("http://resources.download.minecraft.net/" + hashAssets[0] + hashAssets[1] + @"/" + hashAssets, Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + @"\.HeroLauncher\assets\objects\" + hashAssets[0] + hashAssets[1] + @"\" + hashAssets)));
+                    }
+                    countAsset++;
+                    runFunction(10 + countAsset * (30 / JsonAssetsFile["objects"].Count()));
+                    runFunction1("Assets " + countAsset + "/" + JsonAssetsFile["objects"].Count());
+                } else
                 {
-                    webClient.DownloadFile(new Uri("http://resources.download.minecraft.net/" + hashAssets[0] + hashAssets[1] + @"/" + hashAssets), Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + @"\.HeroLauncher\assets\objects\" + hashAssets[0] + hashAssets[1] + @"\" + hashAssets);
+                    countAsset++;
                 }
-                countAsset++;
-                runFunction(10 + (JsonAssetsFile["objects"].Count() / countAsset) * (30 / JsonAssetsFile["objects"].Count()));
-                runFunction1("Assets " + countAsset + "/" + JsonAssetsFile["objects"].Count());
             }
+            Task.WaitAll(tasksAsset.ToArray());
+            ready.Clear();
+            Directory.CreateDirectory(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + @"\.HeroLauncher\versions\" + versionDownload["id"].ToString() + @"\natives");
             //Library
+            WebClient webClient = new WebClient();
             int countClassPath = 0;
             foreach (var obj in versionDownload["libraries"])
             {
@@ -280,11 +294,11 @@ namespace HeroLauncher
                         if (new FileInfo(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + @"\.HeroLauncher\libraries\" + obj["downloads"]["artifact"]["path"]).Length != long.Parse(obj["downloads"]["artifact"]["size"].ToString()))
                         {
                             Directory.CreateDirectory(new FileInfo(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + @"\.HeroLauncher\libraries\" + obj["downloads"]["artifact"]["path"]).DirectoryName);
-                            webClient.DownloadFile(obj["downloads"]["artifact"]["url"].ToString(), Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + @"\.HeroLauncher\libraries\" + obj["downloads"]["artifact"]["path"]);
+                            Task.Factory.StartNew(() => new WebClient().DownloadFile(obj["downloads"]["artifact"]["url"].ToString(), Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + @"\.HeroLauncher\libraries\" + obj["downloads"]["artifact"]["path"])).Wait();
                         }
                         if (countClassPath == 0)
                         {
-                            ClassPathRun = ClassPathRun + Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + @"\.HeroLauncher\libraries\" + @obj["downloads"]["artifact"]["path"].ToString().Replace("/",@"\");
+                            ClassPathRun = ClassPathRun + Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + @"\.HeroLauncher\libraries\" + @obj["downloads"]["artifact"]["path"].ToString().Replace("/", @"\");
                         }
                         else
                         {
@@ -294,7 +308,7 @@ namespace HeroLauncher
                     else
                     {
                         Directory.CreateDirectory(new FileInfo(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + @"\.HeroLauncher\libraries\" + obj["downloads"]["artifact"]["path"]).DirectoryName);
-                        webClient.DownloadFile(obj["downloads"]["artifact"]["url"].ToString(), Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + @"\.HeroLauncher\libraries\" + obj["downloads"]["artifact"]["path"]);
+                        Task.Factory.StartNew(() => new WebClient().DownloadFile(obj["downloads"]["artifact"]["url"].ToString(), Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + @"\.HeroLauncher\libraries\" + obj["downloads"]["artifact"]["path"])).Wait();
                         if (countClassPath == 0)
                         {
                             ClassPathRun = ClassPathRun + Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + @"\.HeroLauncher\libraries\" + @obj["downloads"]["artifact"]["path"].ToString().Replace("/", @"\");
@@ -312,14 +326,16 @@ namespace HeroLauncher
                     {
                         if (objrules["os"] == null)
                         {
-                            if(objrules["action"].ToString() == "allow")
+                            if (objrules["action"].ToString() == "allow")
                             {
                                 allow = true;
-                            } else
+                            }
+                            else
                             {
                                 allow = false;
                             }
-                        } else
+                        }
+                        else
                         {
                             if (objrules["action"].ToString() == "allow")
                             {
@@ -327,7 +343,8 @@ namespace HeroLauncher
                                 {
                                     allow = false;
                                 }
-                            } else
+                            }
+                            else
                             {
                                 if (objrules["os"]["name"].ToString() == "osx")
                                 {
@@ -344,7 +361,7 @@ namespace HeroLauncher
                             if (new FileInfo(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + @"\.HeroLauncher\libraries\" + obj["downloads"]["artifact"]["path"]).Length != long.Parse(obj["downloads"]["artifact"]["size"].ToString()))
                             {
                                 Directory.CreateDirectory(new FileInfo(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + @"\.HeroLauncher\libraries\" + obj["downloads"]["artifact"]["path"]).DirectoryName);
-                                webClient.DownloadFile(obj["downloads"]["artifact"]["url"].ToString(), Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + @"\.HeroLauncher\libraries\" + obj["downloads"]["artifact"]["path"]);
+                                Task.Factory.StartNew(() => new WebClient().DownloadFile(obj["downloads"]["artifact"]["url"].ToString(), Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + @"\.HeroLauncher\libraries\" + obj["downloads"]["artifact"]["path"])).Wait();
                             }
                             if (countClassPath == 0)
                             {
@@ -358,7 +375,7 @@ namespace HeroLauncher
                         else
                         {
                             Directory.CreateDirectory(new FileInfo(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + @"\.HeroLauncher\libraries\" + obj["downloads"]["artifact"]["path"]).DirectoryName);
-                            webClient.DownloadFile(obj["downloads"]["artifact"]["url"].ToString(), Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + @"\.HeroLauncher\libraries\" + obj["downloads"]["artifact"]["path"]);
+                            Task.Factory.StartNew(() => new WebClient().DownloadFile(obj["downloads"]["artifact"]["url"].ToString(), Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + @"\.HeroLauncher\libraries\" + obj["downloads"]["artifact"]["path"])).Wait();
                             if (countClassPath == 0)
                             {
                                 ClassPathRun = ClassPathRun + Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + @"\.HeroLauncher\libraries\" + @obj["downloads"]["artifact"]["path"].ToString().Replace("/", @"\");
@@ -380,13 +397,13 @@ namespace HeroLauncher
                             if (new FileInfo(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + @"\.HeroLauncher\libraries\" + obj["downloads"]["classifiers"][obj["natives"]["windows"].ToString()]["path"]).Length != long.Parse(obj["downloads"]["classifiers"][obj["natives"]["windows"].ToString()]["size"].ToString()))
                             {
                                 Directory.CreateDirectory(new FileInfo(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + @"\.HeroLauncher\libraries\" + obj["downloads"]["classifiers"][obj["natives"]["windows"].ToString()]["path"]).DirectoryName);
-                                webClient.DownloadFile(obj["downloads"]["classifiers"][obj["natives"]["windows"].ToString()]["url"].ToString(), Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + @"\.HeroLauncher\libraries\" + obj["downloads"]["classifiers"][obj["natives"]["windows"].ToString()]["path"]);
+                                Task.Factory.StartNew(() => new WebClient().DownloadFile(obj["downloads"]["classifiers"][obj["natives"]["windows"].ToString()]["url"].ToString(), Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + @"\.HeroLauncher\libraries\" + obj["downloads"]["classifiers"][obj["natives"]["windows"].ToString()]["path"])).Wait();
                             }
                         }
                         else
                         {
                             Directory.CreateDirectory(new FileInfo(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + @"\.HeroLauncher\libraries\" + obj["downloads"]["classifiers"][obj["natives"]["windows"].ToString()]["path"]).DirectoryName);
-                            webClient.DownloadFile(obj["downloads"]["classifiers"][obj["natives"]["windows"].ToString()]["url"].ToString(), Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + @"\.HeroLauncher\libraries\" + obj["downloads"]["classifiers"][obj["natives"]["windows"].ToString()]["path"]);
+                            Task.Factory.StartNew(() => new WebClient().DownloadFile(obj["downloads"]["classifiers"][obj["natives"]["windows"].ToString()]["url"].ToString(), Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + @"\.HeroLauncher\libraries\" + obj["downloads"]["classifiers"][obj["natives"]["windows"].ToString()]["path"])).Wait();
                         }
 
                         FastZip fz = new FastZip();
@@ -394,8 +411,9 @@ namespace HeroLauncher
                     }
                 }
                 countClassPath++;
-                runFunction(40 + (versionDownload["libraries"].Count() / countClassPath) * (30 / versionDownload["libraries"].Count()));
+                runFunction(40 + countClassPath * (30 / versionDownload["libraries"].Count()));
                 runFunction1("Library " + countClassPath + "/" + versionDownload["libraries"].Count());
+
             }
             NativesPath = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + @"\.HeroLauncher\versions\" + versionDownload["id"].ToString() + @"\natives";
             //Version
@@ -405,13 +423,13 @@ namespace HeroLauncher
                 if (new FileInfo(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + @"\.HeroLauncher\versions\" + versionDownload["id"].ToString() + @"\" + versionDownload["id"].ToString() + @".jar").Length != long.Parse(versionDownload["downloads"]["client"]["size"].ToString()))
                 {
                     Directory.CreateDirectory(new FileInfo(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + @"\.HeroLauncher\versions\" + versionDownload["id"].ToString() + @"\" + versionDownload["id"].ToString() + @".jar").DirectoryName);
-                    webClient.DownloadFile(versionDownload["downloads"]["client"]["url"].ToString(), Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + @"\.HeroLauncher\versions\" + versionDownload["id"].ToString() + @"\" + versionDownload["id"].ToString() + @".jar");
+                    Task.Factory.StartNew(() => new WebClient().DownloadFile(versionDownload["downloads"]["client"]["url"].ToString(), Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + @"\.HeroLauncher\versions\" + versionDownload["id"].ToString() + @"\" + versionDownload["id"].ToString() + @".jar")).Wait();
                 }
             }
             else
             {
                 Directory.CreateDirectory(new FileInfo(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + @"\.HeroLauncher\versions\" + versionDownload["id"].ToString() + @"\" + versionDownload["id"].ToString() + @".jar").DirectoryName);
-                webClient.DownloadFile(versionDownload["downloads"]["client"]["url"].ToString(), Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + @"\.HeroLauncher\versions\" + versionDownload["id"].ToString() + @"\" + versionDownload["id"].ToString() + @".jar");
+                Task.Factory.StartNew(() => new WebClient().DownloadFile(versionDownload["downloads"]["client"]["url"].ToString(), Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + @"\.HeroLauncher\versions\" + versionDownload["id"].ToString() + @"\" + versionDownload["id"].ToString() + @".jar")).Wait();
             }
 
             runFunction(90);
@@ -583,6 +601,8 @@ namespace HeroLauncher
             process.Start();
             runFunction(100);
             runFunction1("Start");
+            MessageBox.Show("Minecraft is starting. Please wating ...");
+            ShowHideProgress(false);
             return true;
         }
 
@@ -593,6 +613,22 @@ namespace HeroLauncher
             string productName = (string)reg.GetValue("ProductName");
 
             return productName.StartsWith("Windows 10");
+        }
+
+        private async void ShowHideProgress(bool value)
+        {
+            await Task.Run(() =>
+            {
+                if (value)
+                {
+                    progressBar.Dispatcher.Invoke(() => progressBar.Visibility = Visibility.Visible, System.Windows.Threading.DispatcherPriority.Background);
+                    LogProgressBar.Dispatcher.Invoke(() => LogProgressBar.Visibility = Visibility.Visible, System.Windows.Threading.DispatcherPriority.Background);
+                } else
+                {
+                    progressBar.Dispatcher.Invoke(() => progressBar.Visibility = Visibility.Collapsed, System.Windows.Threading.DispatcherPriority.Background);
+                    LogProgressBar.Dispatcher.Invoke(() => LogProgressBar.Visibility = Visibility.Collapsed, System.Windows.Threading.DispatcherPriority.Background);
+                }
+            });
         }
 
         private async void runFunction(float value)
@@ -727,5 +763,7 @@ namespace HeroLauncher
         {
             BlogInfo.Visibility = Visibility.Collapsed;
         }
+
+        
     }
 }

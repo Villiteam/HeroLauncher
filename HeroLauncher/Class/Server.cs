@@ -12,11 +12,8 @@ namespace HeroLauncher
         public string Name { get; set; }
         public String Version { get; set; }
         public String IpV4 { get; set; }
-        public String IpText { get; set; }
         public string Port { get; set; }
         public String Active { get; set; }
-        public String UpdateAt { get; set; }
-        public String CreateAt { get; set; }
 
         public Server(int id, String name, String version, string ipv4)
         {

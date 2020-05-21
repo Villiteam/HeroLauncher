@@ -29,10 +29,11 @@
                         <ListView.ItemTemplate>
                             <DataTemplate>
                                 <Border Width="185" BorderBrush="Black" BorderThickness="0,0,0,1">
-                                    <StackPanel>
-                                        <TextBlock Text="{Binding Name}" FontWeight="Bold" />
-                                        <TextBlock Text="{Binding Version}" FontWeight="Bold" />
-                                    </StackPanel>
+                                    <Grid>
+                                        <Image Source="{Binding Img}" Height="40" Width="40" Stretch="UniformToFill" HorizontalAlignment="Left"/>
+                                        <TextBlock Text="{Binding Name}" FontWeight="Bold" VerticalAlignment="Top" Margin="50,2,0,0" />
+                                        <TextBlock Text="{Binding Version}" FontWeight="Bold" VerticalAlignment="Bottom" Margin="50,0,0,2" />
+                                    </Grid>
                                 </Border>
                             </DataTemplate>
                         </ListView.ItemTemplate>
@@ -90,8 +91,10 @@
                 </Grid>
             </Grid>
         </Grid>
-                <ProgressBar x:Name="progressBar" Grid.Row="1" Height="50"></ProgressBar>
-        <TextBlock x:Name="LogProgressBar" Grid.Row="1" HorizontalAlignment="Center" VerticalAlignment="Center"></TextBlock>
+        <Grid Grid.Row="1" Background="Black">
+            <ProgressBar x:Name="progressBar" Visibility="Collapsed" Height="50"></ProgressBar>
+            <TextBlock x:Name="LogProgressBar" Visibility="Collapsed" HorizontalAlignment="Center" VerticalAlignment="Center"></TextBlock>
+        </Grid>
         <Grid Background="Black" Grid.Row="2">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition></ColumnDefinition>
