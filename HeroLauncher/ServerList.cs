@@ -24,5 +24,6 @@ namespace HeroLauncher
         public Nullable<int> Active { get; set; }
         public Nullable<System.DateTime> CreateAt { get; set; }
         public Nullable<System.DateTime> UpdateAt { get; set; }
+        public string Img { get; set; }
     }
 }

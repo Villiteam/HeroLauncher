@@ -44,6 +44,7 @@ namespace HeroLauncher
         private static List<String> verListString = new List<String>();
         private static Config config;
         private string startserver = "";
+        private string startport = "";
 
         public MainWindow()
         {
@@ -119,7 +120,7 @@ namespace HeroLauncher
                 var query = context.ServerList.OrderByDescending(t => t.Id).Take(10);
                 foreach(var serv in query)
                 {
-                    servers.Add(new Server(serv.Id, serv.Name, serv.Version, serv.IpV4));
+                    servers.Add(new Server(serv.Id, serv.Name, serv.Version, serv.IpV4, serv.Port.ToString(), serv.Img));
                 }
                 ServerListView.ItemsSource = servers;
             }
@@ -587,7 +588,7 @@ namespace HeroLauncher
             {
                 if (startserver.Length >= 1)
                 {
-                    FullCmd = FullCmd + "--server=\"" + startserver + "\"";
+                    FullCmd = FullCmd + " --server=\"" + startserver + "\" " + "--port " + startport + " ";
                 }
             }
 
@@ -731,6 +732,7 @@ namespace HeroLauncher
                 Server server = (Server)(item.Content);
                 ServerChoice.Text = server.Name;
                 startserver = server.IpV4;
+                startport = server.Port;
             }
         }
 

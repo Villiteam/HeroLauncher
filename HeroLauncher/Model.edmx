@@ -35,6 +35,7 @@
           <Property Name="Active" Type="int" />
           <Property Name="CreateAt" Type="datetime" />
           <Property Name="UpdateAt" Type="datetime" />
+          <Property Name="Img" Type="text" />
         </EntityType>
         <EntityContainer Name="HeroLauncherModelStoreContainer">
           <EntitySet Name="Blogs" EntityType="Self.Blogs" Schema="dbo" store:Type="Tables" />
@@ -74,6 +75,7 @@
           <Property Name="Active" Type="Int32" />
           <Property Name="CreateAt" Type="DateTime" Precision="3" />
           <Property Name="UpdateAt" Type="DateTime" Precision="3" />
+          <Property Name="Img" Type="String" MaxLength="Max" FixedLength="false" Unicode="false" />
         </EntityType>
         <EntityContainer Name="HeroLauncherEntities" annotation:LazyLoadingEnabled="true">
           <EntitySet Name="Blogs" EntityType="Self.Blogs" />
@@ -105,6 +107,7 @@
           <EntitySetMapping Name="ServerList">
             <EntityTypeMapping TypeName="HeroLauncherModel.ServerList">
               <MappingFragment StoreEntitySet="ServerList">
+                <ScalarProperty Name="Img" ColumnName="Img" />
                 <ScalarProperty Name="UpdateAt" ColumnName="UpdateAt" />
                 <ScalarProperty Name="CreateAt" ColumnName="CreateAt" />
                 <ScalarProperty Name="Active" ColumnName="Active" />

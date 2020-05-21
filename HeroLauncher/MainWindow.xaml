@@ -28,7 +28,7 @@
                     <ListView Name="ServerListView" Background="{x:Null}">
                         <ListView.ItemTemplate>
                             <DataTemplate>
-                                <Border Width="185" BorderBrush="Black" BorderThickness="0,0,0,1">
+                                <Border Width="185" BorderBrush="Black">
                                     <Grid>
                                         <Image Source="{Binding Img}" Height="40" Width="40" Stretch="UniformToFill" HorizontalAlignment="Left"/>
                                         <TextBlock Text="{Binding Name}" FontWeight="Bold" VerticalAlignment="Top" Margin="50,2,0,0" />
